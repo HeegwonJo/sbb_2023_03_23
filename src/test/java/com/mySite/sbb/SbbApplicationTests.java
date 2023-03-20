@@ -1,13 +1,24 @@
 package com.mySite.sbb;
 
+import com.mySite.sbb.domain.question.entity.Question;
+import com.mySite.sbb.domain.question.repository.QuestionRepository;
+
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 @SpringBootTest
 class SbbApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
 
+    @Autowired
+    private QuestionRepository questionRepository;
+    @Test
+    void testJpa() {
+        Question q = this.questionRepository.findBySubject("sbb가 무엇인가요?");
+        assertEquals(1,q.getId());
+    }
 }
