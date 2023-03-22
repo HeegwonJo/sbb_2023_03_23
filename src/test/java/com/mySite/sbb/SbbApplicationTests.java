@@ -75,7 +75,6 @@ class SbbApplicationTests {
         a1.setCreateTime(LocalDateTime.now());
         answerRepository.save(a1);
     }
-
     @Test
     @DisplayName("데이터 저장")
     void t001() {
@@ -119,7 +118,14 @@ class SbbApplicationTests {
             assertEquals("sbb가 무엇인가요?", q.getSubject());
         }
     }
-
+    @Test
+    void 회원가입테스트(){
+        SiteUser user = new SiteUser();
+        user.setUsername("테스트유저1");
+        user.setPassword(new BCryptPasswordEncoder().encode("password"));
+        user.setEmail("test@test.com");
+        this.userRepository.save(user);
+    }
     /*
     SQL
     SELECT *
@@ -253,13 +259,18 @@ class SbbApplicationTests {
         }
     }
 
+
     @Test
-    void 회원가입테스트(){
+    void 회원글쓰기테스트(){
+        Question q = new Question();
         SiteUser user = new SiteUser();
-        user.setUsername("테스트유저1");
-        user.setPassword(new BCryptPasswordEncoder().encode("password"));
-        user.setEmail("test@test.com");
+        user.setUsername("testuser");
         this.userRepository.save(user);
+        q.setAuthor(user);
+        q.setSubject("Test");
+        q.setContent("테스트 내용입니다.");
+        q.setCreateTime(LocalDateTime.now());
+        this.questionRepository.save(q);
     }
 
 }

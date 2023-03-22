@@ -25,6 +25,8 @@ public class Question {
     private String content;
 
     private LocalDateTime createTime;
+    private LocalDateTime modifyDate;
+
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     private List<Answer> answerList= new ArrayList<>();
