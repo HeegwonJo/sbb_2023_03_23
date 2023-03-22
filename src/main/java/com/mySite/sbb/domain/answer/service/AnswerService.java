@@ -1,5 +1,6 @@
 package com.mySite.sbb.domain.answer.service;
 
+import com.mySite.sbb.domain.SiteUser.SiteUser;
 import com.mySite.sbb.domain.answer.entity.Answer;
 import com.mySite.sbb.domain.answer.repository.AnswerRepository;
 import com.mySite.sbb.domain.question.entity.Question;
@@ -13,11 +14,12 @@ import java.time.LocalDateTime;
 public class AnswerService {
     private final AnswerRepository answerRepository;
 
-    public void createAnswer(Question question, String content) {
+    public void createAnswer(Question question, String content, SiteUser author) {
         Answer answer = new Answer();
         answer.setContent (content);
         answer.setCreateTime(LocalDateTime.now());
         answer.setQuestion(question);
+        answer.setAuthor(author);
         this.answerRepository.save(answer);
     }
 

@@ -1,5 +1,6 @@
 package com.mySite.sbb.domain.question.entity;
 
+import com.mySite.sbb.domain.SiteUser.SiteUser;
 import com.mySite.sbb.domain.answer.entity.Answer;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -32,4 +33,6 @@ public class Question {
         a.setQuestion(this);
         answerList.add(a);
     }
+    @ManyToOne
+    private SiteUser author;
 }

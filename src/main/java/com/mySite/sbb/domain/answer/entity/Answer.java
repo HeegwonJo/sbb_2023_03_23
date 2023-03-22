@@ -1,5 +1,6 @@
 package com.mySite.sbb.domain.answer.entity;
 
+import com.mySite.sbb.domain.SiteUser.SiteUser;
 import com.mySite.sbb.domain.question.entity.Question;
 import com.mySite.sbb.domain.question.repository.QuestionRepository;
 import jakarta.persistence.*;
@@ -23,6 +24,9 @@ public class Answer {
 
     @ManyToOne
     private Question question;
+
+    @ManyToOne
+    private SiteUser author;
 }
 
 

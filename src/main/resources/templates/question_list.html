@@ -4,7 +4,8 @@
         <thead class="table-dark">
         <tr>
             <th>번호</th>
-            <th>제목</th>
+            <th style="width: 50%">제목</th>
+            <th>작성자</th>
             <th>작성일시</th>
         </tr>
         </thead>
@@ -19,6 +20,7 @@
                       th:text="${#lists.size(question.answerList)}">
                     </span>
             </td>
+            <td><span th:if="${question.author!=null}" th:text="${question.author.username}"></span></td>
             <td th:text="${#temporals.format(question.getCreateTime, 'yyyy-MM-dd HH:mm')}"></td>
         </tr>
         </tbody>
@@ -46,6 +48,6 @@
         </ul>
     </div>
     <!-- 페이징처리 끝 -->
-    <a th:href="@{/question/create}" class="btn btn-primary"> 질문 등록하기</a>
+    <a th:href="@{/question/create}" class="btn btn-primary justify-content-end"> 질문 등록하기</a>
 </div>
 </html>

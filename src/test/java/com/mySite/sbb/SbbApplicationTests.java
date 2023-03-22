@@ -1,5 +1,9 @@
 package com.mySite.sbb;
 
+import com.mySite.sbb.domain.SiteUser.SiteUser;
+import com.mySite.sbb.domain.SiteUser.UserCreateForm;
+import com.mySite.sbb.domain.SiteUser.UserRepository;
+import com.mySite.sbb.domain.SiteUser.UserService;
 import com.mySite.sbb.domain.answer.entity.Answer;
 import com.mySite.sbb.domain.answer.repository.AnswerRepository;
 import com.mySite.sbb.domain.question.entity.Question;
@@ -11,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -31,6 +36,10 @@ class SbbApplicationTests {
     private AnswerRepository answerRepository;
     @Autowired
     private QuestionService questionService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
 
     @BeforeEach
         // 아래 메서드는 각 테스트케이스가 실행되기 전에 실행된다.
@@ -236,11 +245,21 @@ class SbbApplicationTests {
     }
 
     @Test
-    void testJpa() {
+    void 테스트케이스300개() {
         for (int i = 1; i <= 300; i++) {
             String subject = String.format("테스트 데이터입니다:[%03d]", i);
             String content = "내용무";
-            this.questionService.create(subject, content);
+            this.questionService.create(subject, content, null);
         }
     }
+
+    @Test
+    void 회원가입테스트(){
+        SiteUser user = new SiteUser();
+        user.setUsername("테스트유저1");
+        user.setPassword(new BCryptPasswordEncoder().encode("password"));
+        user.setEmail("test@test.com");
+        this.userRepository.save(user);
+    }
+
 }
