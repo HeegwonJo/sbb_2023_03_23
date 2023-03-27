@@ -47,6 +47,7 @@ public class QuestionService {
         question.setContent(content);
         question.setCreateTime(LocalDateTime.now());
         question.setAuthor(author);
+        question.setViewCount(0);
         this.questionRepository.save(question);
     }
 
@@ -63,6 +64,11 @@ public class QuestionService {
 
     public void vote(Question question, SiteUser siteUser) {
         question.getVoter().add(siteUser);
+        this.questionRepository.save(question);
+    }
+
+    public void Count(Question question){
+        question.setViewCount(question.getViewCount()+1);
         this.questionRepository.save(question);
     }
 
