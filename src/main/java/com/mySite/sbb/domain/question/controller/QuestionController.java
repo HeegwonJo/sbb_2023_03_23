@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
@@ -46,6 +47,15 @@ public class QuestionController {
         model.addAttribute("paging",paging);
         model.addAttribute("keyword",keyword);
         return "question_list";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("list/mine")
+    public String myList(Model model, Principal principal, @RequestParam(value="page",defaultValue = "0") int page){
+        List<Question> mine=this.questionService.getMyQuestion(principal.getName(), 5);
+        if(mine.size()==0) return "question_list";
+        model.addAttribute("myQuestionList",mine);
+        return"myQuestion_List.html";
     }
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")

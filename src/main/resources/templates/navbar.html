@@ -17,7 +17,7 @@
                 </li>
             </ul>
             <li sec:authorize="isAuthenticated()">
-                <a th:href="@{|/user/mypage/{}|}">
+                <a th:href="@{|/user/mypage/${}|}">
                     <span sec:authentication="principal.username"></span>
                 </a>님 환영합니다.
             </li>

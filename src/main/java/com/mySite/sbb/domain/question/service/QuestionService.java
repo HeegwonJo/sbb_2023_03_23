@@ -14,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,12 @@ public class QuestionService {
         } else {
             throw new DataNotFoundException("question not found");
         }
+    }
+
+    public List<Question> getMyQuestion(String username, int num){
+        Pageable pageable=PageRequest.of(0,num);
+        List<Question> MyQuestionList =this.questionRepository.findByAuthor(username,pageable);
+        return MyQuestionList;
     }
 
     public void create(String subject, String content, SiteUser author) {

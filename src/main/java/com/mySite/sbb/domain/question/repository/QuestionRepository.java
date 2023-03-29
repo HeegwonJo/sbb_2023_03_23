@@ -1,5 +1,6 @@
 package com.mySite.sbb.domain.question.repository;
 
+import com.mySite.sbb.domain.SiteUser.SiteUser;
 import com.mySite.sbb.domain.answer.entity.Answer;
 import com.mySite.sbb.domain.question.entity.Question;
 import org.hibernate.metamodel.model.convert.spi.JpaAttributeConverter;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -25,4 +27,11 @@ public interface QuestionRepository extends JpaRepository<Question,Integer> {
     List<Question> findBySubjectLike(String s);
     Page<Question> findAll(Pageable pageable);
     Page<Question> findAll(Specification<Question>spec,Pageable pageable);
+
+    @Query("select q "
+            + "from Question q "
+            + "join SiteUser u on q.author=u "
+            + "where u.username = :username "
+            + "order by q.createTime desc ")
+    List<Question> findByAuthor(@Param("username") String username, Pageable pageable);
 }
