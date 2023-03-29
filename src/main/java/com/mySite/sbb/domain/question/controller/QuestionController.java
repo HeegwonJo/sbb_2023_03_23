@@ -30,9 +30,9 @@ public class QuestionController {
     private final UserService userService;
     private final AnswerService answerService;
     @GetMapping(value = "/detail/{id}")
-    public String detail(Model model, @PathVariable ("id")Integer id, AnswerForm answerForm , @RequestParam(value="page",defaultValue="0")int page){
+    public String detail(Model model, @PathVariable ("id")Integer id, AnswerForm answerForm , @RequestParam(value="answerPage",defaultValue="0")int answerPage){
         Question question = this.questionService.getQuestion(id);
-        Page<Answer> answerPaging= this.answerService.getList(question,page);
+        Page<Answer> answerPaging= this.answerService.getList(question,answerPage);
         questionService.Count(question);
         model.addAttribute("question",question);
         model.addAttribute("answerPaging",answerPaging);

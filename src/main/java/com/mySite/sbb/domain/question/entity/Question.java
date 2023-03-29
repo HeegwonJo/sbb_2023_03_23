@@ -42,5 +42,8 @@ public class Question {
     @ManyToMany
     Set<SiteUser> voter;
 
-    Integer viewCount;
+    private Integer viewCount;
+
+    private Category category;
+
 }
