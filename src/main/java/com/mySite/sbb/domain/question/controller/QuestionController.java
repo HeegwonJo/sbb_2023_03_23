@@ -2,10 +2,11 @@ package com.mySite.sbb.domain.question.controller;
 
 import com.mySite.sbb.domain.SiteUser.SiteUser;
 import com.mySite.sbb.domain.SiteUser.UserService;
-import com.mySite.sbb.domain.answer.AnswerForm;
-import com.mySite.sbb.domain.question.QuestionForm;
+import com.mySite.sbb.domain.answer.entity.AnswerForm;
+import com.mySite.sbb.domain.answer.entity.Answer;
+import com.mySite.sbb.domain.answer.service.AnswerService;
+import com.mySite.sbb.domain.question.entity.QuestionForm;
 import com.mySite.sbb.domain.question.entity.Question;
-import com.mySite.sbb.domain.question.repository.QuestionRepository;
 import com.mySite.sbb.domain.question.service.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
@@ -28,11 +28,14 @@ public class QuestionController {
 
     private final QuestionService questionService;
     private final UserService userService;
+    private final AnswerService answerService;
     @GetMapping(value = "/detail/{id}")
-    public String detail(Model model, @PathVariable ("id")Integer id, AnswerForm answerForm){
+    public String detail(Model model, @PathVariable ("id")Integer id, AnswerForm answerForm , @RequestParam(value="page",defaultValue="0")int page){
         Question question = this.questionService.getQuestion(id);
+        Page<Answer> answerPaging= this.answerService.getList(question,page);
         questionService.Count(question);
         model.addAttribute("question",question);
+        model.addAttribute("answerPaging",answerPaging);
         return "question_detail";
     }
 

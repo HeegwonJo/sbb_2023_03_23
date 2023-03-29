@@ -1,4 +1,4 @@
-package com.mySite.sbb.domain.answer;
+package com.mySite.sbb.domain.answer.entity;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;

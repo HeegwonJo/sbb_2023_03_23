@@ -20,6 +20,7 @@
             <th>조회수</th>
         </tr>
         </thead>
+<!--        질문 반복 표시-->
         <tbody>
         <tr class="text-center" th:each="question, loop : ${paging}">
             <td th:text="${paging.getTotalElements - (paging.number * paging.size) - loop.index}"></td>
@@ -46,7 +47,7 @@
                 </a>
             </li>
             <li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
-                th:if="${page >= paging.number-5 and page <= paging.number+5}"
+                th:if="${page >= paging.number-3 and page <= paging.number+3}"
                 th:classappend="${page == paging.number} ? 'active'" class="page-item">
                 <a th:text="${page}" class="page-link" href="javascript:void(0)" th:data-page="${page}"></a>
             </li>

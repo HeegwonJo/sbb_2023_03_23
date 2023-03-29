@@ -2,7 +2,7 @@ package com.mySite.sbb.domain.answer.controller;
 
 import com.mySite.sbb.domain.SiteUser.SiteUser;
 import com.mySite.sbb.domain.SiteUser.UserService;
-import com.mySite.sbb.domain.answer.AnswerForm;
+import com.mySite.sbb.domain.answer.entity.AnswerForm;
 import com.mySite.sbb.domain.answer.entity.Answer;
 import com.mySite.sbb.domain.answer.service.AnswerService;
 import com.mySite.sbb.domain.question.entity.Question;
@@ -32,11 +32,13 @@ public class AnswerController {
     public String createAnswer(Model model, @PathVariable("id") Integer id, @Valid AnswerForm answerForm, BindingResult bindingResult, Principal principal) {
         Question question = this.questionService.getQuestion(id);
         SiteUser user = this.userService.getUser(principal.getName());
+        Answer answer = this.answerService.create(question, answerForm.getContent(), user);
+        int page = question.getAnswerList().size()/10;
         if (bindingResult.hasErrors()) {
             model.addAttribute("question", question);
             return "question_detail";
         }
-        Answer answer = this.answerService.create(question, answerForm.getContent(), user);
+        model.addAttribute("answerPage",page);
         return String.format("redirect:/question/detail/%s#answer_%s", answer.getQuestion().getId(),answer.getId());
     }
 

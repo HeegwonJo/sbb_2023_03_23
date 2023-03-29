@@ -6,9 +6,15 @@ import com.mySite.sbb.domain.answer.entity.Answer;
 import com.mySite.sbb.domain.answer.repository.AnswerRepository;
 import com.mySite.sbb.domain.question.entity.Question;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -25,7 +31,6 @@ public class AnswerService {
         this.answerRepository.save(answer);
         return answer;
     }
-
     public Answer getAnswer(Integer id) {
         Optional<Answer> answer = this.answerRepository.findById(id);
         if (answer.isPresent()) {
@@ -33,6 +38,14 @@ public class AnswerService {
         } else {
             throw new DataNotFoundException("answer not found");
         }
+    }
+
+    public Page<Answer> getList(Question question, int page) {
+        List<Sort.Order> sorts=new ArrayList<>();
+        sorts.add(Sort.Order.desc("voter"));
+        sorts.add(Sort.Order.asc("createTime"));
+        Pageable pageable= PageRequest.of(page,5,Sort.by(sorts));
+        return this.answerRepository.findByQuestion(question,pageable);
     }
 
     public void modify(Answer answer, String content) {
