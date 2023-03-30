@@ -16,7 +16,7 @@
     <span th:if="${paging.size==0}" th:text="등록된 질문이 없습니다."></span>
     <tr class="text-center" th:each="answer, loop : ${paging}">
       <td th:text="${paging.getTotalElements - (paging.number * paging.size) - loop.index}"></td>
-      <td >
+      <td class="text-center">
         <a th:href="@{|/question/detail/${answer.question.id}|}" th:text="${answer.question.subject}"></a>
       </td>
       <td class="text-start">
@@ -28,4 +28,39 @@
     </tbody>
   </table>
 
+<!--  페이징 처리 시작-->
+  <div th:if="${!paging.isEmpty()}">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
+        <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number-1}">
+          <span>이전</span>
+        </a>
+      </li>
+      <li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
+          th:if="${page >= paging.number-3 and page <= paging.number+3}"
+          th:classappend="${page == paging.number} ? 'active'" class="page-item">
+        <a th:text="${page}" class="page-link" href="javascript:void(0)" th:data-page="${page}"></a>
+      </li>
+      <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
+        <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number+1}">
+          <span>다음</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <!-- 페이징처리 끝 -->
+  <form th:action="@{/answer/list/myAnswer}" method="get" id="searchForm">
+    <input type="hidden" id="keyword" name="keyword" th:value="${keyword}">
+    <input type="hidden" id="page" name="page" th:value="${paging.number}">
+  </form>
+
+  <script>
+    const page_elements = document.getElementsByClassName("page-link");
+    Array.from(page_elements).forEach(function(element) {
+      element.addEventListener('click', function() {
+        document.getElementById('page').value = this.dataset.page;
+        document.getElementById('searchForm').submit();
+      });
+    });
+  </script>
 </div>

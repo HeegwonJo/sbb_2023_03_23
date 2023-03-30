@@ -49,7 +49,7 @@ public class QuestionService {
         return MyQuestionList;
     }
 
-    public void create(String subject, String content, SiteUser author) {
+    public Question create(String subject, String content, SiteUser author) {
         Question question = new Question();
         question.setSubject(subject);
         question.setContent(content);
@@ -57,6 +57,7 @@ public class QuestionService {
         question.setAuthor(author);
         question.setViewCount(0);
         this.questionRepository.save(question);
+        return question;
     }
 
     public void modify(Question question, String subject, String content) {
@@ -97,4 +98,5 @@ public class QuestionService {
             }
         };
     }
+
 }

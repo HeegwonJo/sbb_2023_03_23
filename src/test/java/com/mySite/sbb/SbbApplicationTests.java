@@ -1,48 +1,49 @@
 package com.mySite.sbb;
 
 import com.mySite.sbb.domain.SiteUser.SiteUser;
-import com.mySite.sbb.domain.SiteUser.UserCreateForm;
 import com.mySite.sbb.domain.SiteUser.UserRepository;
 import com.mySite.sbb.domain.SiteUser.UserService;
 import com.mySite.sbb.domain.answer.entity.Answer;
 import com.mySite.sbb.domain.answer.repository.AnswerRepository;
+import com.mySite.sbb.domain.answer.service.AnswerService;
 import com.mySite.sbb.domain.question.entity.Question;
 import com.mySite.sbb.domain.question.repository.QuestionRepository;
-
 import com.mySite.sbb.domain.question.service.QuestionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.data.domain.Page;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 @SpringBootTest
 class SbbApplicationTests {
-
+    @Autowired
+    private QuestionService questionService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private AnswerService answerService;
 
     @Autowired
     private QuestionRepository questionRepository;
     @Autowired
     private AnswerRepository answerRepository;
     @Autowired
-    private QuestionService questionService;
-    @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private UserService userService;
 
-    @BeforeEach
+
         // 아래 메서드는 각 테스트케이스가 실행되기 전에 실행된다.
+    @BeforeEach
     void beforeEach() {
         // 모든 데이터 삭제
         answerRepository.deleteAll();
@@ -54,36 +55,31 @@ class SbbApplicationTests {
         // 흔적삭제(다음번 INSERT 때 id가 1번으로 설정되도록)
         questionRepository.clearAutoIncrement();
 
-        // 질문 1개 생성
-        Question q1 = new Question();
-        q1.setSubject("sbb가 무엇인가요?");
-        q1.setContent("sbb에 대해서 알고 싶습니다.");
-        q1.setCreateTime(LocalDateTime.now());
-        questionRepository.save(q1);  // 첫번째 질문 저장
+        // 모든 데이터 삭제
+        userRepository.deleteAll();
+        userRepository.clearAutoIncrement();
+
+        // 회원 2명 생성
+        SiteUser user1 = userService.createUser("user1", "user1@test.com", "1234");
+        SiteUser user2 = userService.createUser("user2", "user2@test.com", "1234");
 
         // 질문 1개 생성
-        Question q2 = new Question();
-        q2.setSubject("스프링부트 모델 질문입니다.");
-        q2.setContent("id는 자동으로 생성되나요?");
-        q2.setCreateTime(LocalDateTime.now());
-        questionRepository.save(q2);  // 두번째 질문 저장
+        Question q1 = questionService.create("sbb가 무엇인가요?", "sbb에 대해서 알고 싶습니다.", user1);
 
-        // 답변 1개 생성
-        Answer a1 = new Answer();
-        a1.setContent("네 자동으로 생성됩니다.");
-        q2.addAnswer(a1);
-        a1.setCreateTime(LocalDateTime.now());
-        answerRepository.save(a1);
+        // 질문 1개 생성
+        Question q2 = questionService.create("스프링부트 모델 질문입니다.", "id는 자동으로 생성되나요?", user1);
+
+        Answer a1 = answerService.create(q2, "네 자동으로 생성됩니다.", user2);
+
     }
+
     @Test
     @DisplayName("데이터 저장")
     void t001() {
+        SiteUser user1 = userService.getUser("user1");
+
         // 질문 1개 생성
-        Question q = new Question();
-        q.setSubject("세계에서 가장 부유한 국가가 어디인가요?");
-        q.setContent("알고 싶습니다.");
-        q.setCreateTime(LocalDateTime.now());
-        questionRepository.save(q);
+        Question q = questionService.create("세계에서 가장 부유한 국가가 어디인가요?", "알고 싶습니다.", user1);
 
         assertEquals("세계에서 가장 부유한 국가가 어디인가요?", questionRepository.findById(3).get().getSubject());
     }
@@ -118,14 +114,7 @@ class SbbApplicationTests {
             assertEquals("sbb가 무엇인가요?", q.getSubject());
         }
     }
-    @Test
-    void 회원가입테스트(){
-        SiteUser user = new SiteUser();
-        user.setUsername("테스트유저1");
-        user.setPassword(new BCryptPasswordEncoder().encode("password"));
-        user.setEmail("test@test.com");
-        this.userRepository.save(user);
-    }
+
     /*
     SQL
     SELECT *
@@ -211,6 +200,8 @@ class SbbApplicationTests {
         assertEquals(1, questionRepository.count());
     }
 
+    @Transactional // 여기서의 트랜잭션의 역할 : 함수가 끝날 때까지 전화(DB와의)를 끊지 않음
+    @Rollback(false)
     @Test
     @DisplayName("답변 데이터 생성 후 저장하기")
     void t009() {
@@ -229,14 +220,22 @@ class SbbApplicationTests {
         Question q = questionRepository.findById(2).get();
         */
 
-        Answer a = new Answer();
-        a.setContent("네 자동으로 생성됩니다.");
-        a.setQuestion(q);  // 어떤 질문의 답변인지 알기위해서 Question 객체가 필요하다.
-        a.setCreateTime(LocalDateTime.now());
-        answerRepository.save(a);
+        SiteUser user2 = userService.getUser("user2");
+
+        Answer a = answerService.create(q, "네 자동으로 생성됩니다.", user2);
     }
 
-    @Transactional
+    @Test
+    @DisplayName("답변 조회하기")
+    void t010() {
+        Optional<Answer> oa = answerRepository.findById(1);
+        assertTrue(oa.isPresent());
+        Answer a = oa.get();
+        assertEquals(2, a.getQuestion().getId());
+    }
+
+    @Transactional // 여기서의 트랜잭션의 역할 : 함수가 끝날 때까지 전화(DB와의)를 끊지 않음
+    @Rollback(false)
     @Test
     @DisplayName("질문에 달린 답변 찾기")
     void t011() {
@@ -251,26 +250,66 @@ class SbbApplicationTests {
     }
 
     @Test
-    void 테스트케이스300개() {
-        for (int i = 1; i <= 300; i++) {
-            String subject = String.format("테스트 데이터입니다:[%03d]", i);
-            String content = "내용무";
-            this.questionService.create(subject, content, null);
-        }
-    }
+    @DisplayName("검색, 질문제목으로 검색할 수 있다.")
+    void t012() {
+        Page<Question> searchResult = questionService.getList(0, "sbb가 무엇인가요");
 
+        assertEquals(1, searchResult.getTotalElements());
+    }
 
     @Test
-    void 회원글쓰기테스트(){
-        Question q = new Question();
-        SiteUser user = new SiteUser();
-        user.setUsername("testuser");
-        this.userRepository.save(user);
-        q.setAuthor(user);
-        q.setSubject("Test");
-        q.setContent("테스트 내용입니다.");
-        q.setCreateTime(LocalDateTime.now());
-        this.questionRepository.save(q);
+    @DisplayName("검색, 질문내용으로 검색할 수 있다.")
+    void t013() {
+        Page<Question> searchResult = questionService.getList(0, "sbb에 대해서 알고 싶습니다.");
+
+        assertEquals(1, searchResult.getTotalElements());
     }
 
+    @Test
+    @DisplayName("검색, 질문자이름으로 검색할 수 있다.")
+    void t014() {
+        Page<Question> searchResult = questionService.getList(0, "user1");
+
+        assertEquals(2, searchResult.getTotalElements());
+    }
+
+    @Test
+    @DisplayName("검색, 답변내용으로 검색할 수 있다.")
+    void t015() {
+        Page<Question> searchResult = questionService.getList(0, "네 자동으로 생성됩니다.");
+
+        assertEquals(2, searchResult.getContent().get(0).getId());
+        assertEquals(1, searchResult.getTotalElements());
+    }
+
+    @Test
+    @DisplayName("검색, 답변자이름으로 검색할 수 있다.")
+    void t016() {
+        Page<Question> searchResult = questionService.getList(0, "user2");
+
+        assertEquals(2, searchResult.getContent().get(0).getId());
+        assertEquals(1, searchResult.getTotalElements());
+    }
+
+    @Test
+    @DisplayName("대량 테스트 데이터 만들기")
+    void t17() {
+        SiteUser user2 = userService.getUser("user2");
+        IntStream.rangeClosed(3, 300).forEach(no -> questionService.create("테스트 제목입니다. %d".formatted(no), "테스트 내용입니다. %d".formatted(no), user2));
+        SiteUser user1 = userService.getUser("user1");
+        IntStream.rangeClosed(3, 300).forEach(no -> questionService.create("테스트 제목입니다. user 1의 %d".formatted(no), "테스트 내용입니다. %d".formatted(no), user1));
+
+        Question q=questionService.getQuestion(30);
+        IntStream.rangeClosed(3, 300).forEach(no -> answerService.create(q,"답변입니다",user2));
+
+    }
+
+    @Test
+    @DisplayName("대량 테스트 데이터 답변 만들기")
+    void t18() {
+        SiteUser user2 = userService.getUser("user2");
+        Question q=questionService.getQuestion(30);
+
+        IntStream.rangeClosed(3, 300).forEach(no -> answerService.create(q,"답변입니다",user2));
+    }
 }

@@ -28,4 +28,5 @@ public class UserService {
         }
         else throw new DataNotFoundException("유저가 없습니다.");
     }
+
 }

@@ -44,4 +44,5 @@ public class Question {
 
     private Integer viewCount;
 
+
 }
