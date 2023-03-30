@@ -30,6 +30,7 @@ public class QuestionController {
     private final QuestionService questionService;
     private final UserService userService;
     private final AnswerService answerService;
+
     @GetMapping(value = "/detail/{id}")
     public String detail(Model model, @PathVariable ("id")Integer id, AnswerForm answerForm , @RequestParam(value="answerPage",defaultValue="0")int answerPage){
         Question question = this.questionService.getQuestion(id);
@@ -50,12 +51,13 @@ public class QuestionController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("list/mine")
-    public String myList(Model model, Principal principal, @RequestParam(value="page",defaultValue = "0") int page){
-        List<Question> mine=this.questionService.getMyQuestion(principal.getName(), 5);
-        if(mine.size()==0) return "question_list";
-        model.addAttribute("myQuestionList",mine);
-        return"myQuestion_List.html";
+    @GetMapping("list/myQuestion")
+    public String getMyList(Model model, Principal principal, @RequestParam(value="page",defaultValue = "0")int page){
+        String username = principal.getName();
+        SiteUser user = this.userService.getUser(username);
+        Page<Question> myQuestion =this.questionService.getMyQuestion(page,user);
+        model.addAttribute("paging",myQuestion);
+        return"myQuestion_List";
     }
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")

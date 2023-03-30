@@ -43,9 +43,9 @@ public class QuestionService {
         }
     }
 
-    public List<Question> getMyQuestion(String username, int num){
-        Pageable pageable=PageRequest.of(0,num);
-        List<Question> MyQuestionList =this.questionRepository.findByAuthor(username,pageable);
+    public Page<Question> getMyQuestion(int page ,SiteUser author){
+        Pageable pageable = PageRequest.of(page,10);
+        Page<Question> MyQuestionList =this.questionRepository.findByAuthor(author,pageable);
         return MyQuestionList;
     }
 

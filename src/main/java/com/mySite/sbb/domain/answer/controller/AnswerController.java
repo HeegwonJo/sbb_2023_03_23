@@ -9,6 +9,7 @@ import com.mySite.sbb.domain.question.entity.Question;
 import com.mySite.sbb.domain.question.service.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -34,13 +35,13 @@ public class AnswerController {
         Question question = this.questionService.getQuestion(id);
         SiteUser user = this.userService.getUser(principal.getName());
         Answer answer = this.answerService.create(question, answerForm.getContent(), user);
-        int page = question.getAnswerList().size()/10;
+        int page = question.getAnswerList().size() / 10;
         if (bindingResult.hasErrors()) {
             model.addAttribute("question", question);
             return "question_detail";
         }
-        re.addAttribute("answerPage",page);
-        return String.format("redirect:/question/detail/%s#answer_%s", answer.getQuestion().getId(),answer.getId());
+        re.addAttribute("answerPage", page);
+        return String.format("redirect:/question/detail/%s#answer_%s", answer.getQuestion().getId(), answer.getId());
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -66,7 +67,7 @@ public class AnswerController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
         this.answerService.modify(answer, answerForm.getContent());
-        return String.format("redirect:/question/detail/%s#answer_%s", answer.getQuestion().getId(),answer.getId());
+        return String.format("redirect:/question/detail/%s#answer_%s", answer.getQuestion().getId(), answer.getId());
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -82,11 +83,21 @@ public class AnswerController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/vote/{id}")
-    public String answerVote(Principal principal, @PathVariable("id") Integer id){
+    public String answerVote(Principal principal, @PathVariable("id") Integer id) {
         Answer answer = this.answerService.getAnswer(id);
-        SiteUser siteUser= this.userService.getUser(principal.getName());
+        SiteUser siteUser = this.userService.getUser(principal.getName());
         this.answerService.vote(answer, siteUser);
-        return String.format("redirect:/question/detail/%s#answer_%s", answer.getQuestion().getId(),answer.getId());
+        return String.format("redirect:/question/detail/%s#answer_%s", answer.getQuestion().getId(), answer.getId());
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/list/myAnswer")
+    public String getMyList(Model model, Principal principal, @RequestParam(value="page",defaultValue = "0")int page){
+        String username = principal.getName();
+        SiteUser user = this.userService.getUser(username);
+        Page<Answer> myAnswer =this.answerService.getMyAnswer(page,user);
+        model.addAttribute("paging",myAnswer);
+        return "myAnswer_List";
     }
 }
 

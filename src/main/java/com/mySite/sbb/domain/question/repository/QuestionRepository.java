@@ -28,10 +28,6 @@ public interface QuestionRepository extends JpaRepository<Question,Integer> {
     Page<Question> findAll(Pageable pageable);
     Page<Question> findAll(Specification<Question>spec,Pageable pageable);
 
-    @Query("select q "
-            + "from Question q "
-            + "join SiteUser u on q.author=u "
-            + "where u.username = :username "
-            + "order by q.createTime desc ")
-    List<Question> findByAuthor(@Param("username") String username, Pageable pageable);
+    Page<Question> findByAuthor (SiteUser author, Pageable pageable);
+
 }

@@ -13,6 +13,7 @@
     </thead>
     <!--        질문 반복 표시-->
     <tbody>
+    <span th:if="${paging.size==0}" th:text="등록된 질문이 없습니다."></span>
     <tr class="text-center" th:each="question, loop : ${paging}">
         <td th:text="${paging.getTotalElements - (paging.number * paging.size) - loop.index}"></td>
 

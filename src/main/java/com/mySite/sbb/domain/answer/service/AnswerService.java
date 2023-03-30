@@ -61,4 +61,10 @@ public class AnswerService {
         answer.getVoter().add(siteUser);
         this.answerRepository.save(answer);
     }
+
+    public Page<Answer> getMyAnswer(int page, SiteUser user) {
+        Pageable pageable = PageRequest.of(page,10);
+        Page<Answer> MyAnswerList =this.answerRepository.findByAuthor(user,pageable);
+        return MyAnswerList;
+    }
 }
