@@ -3,6 +3,7 @@ package com.mySite.sbb.domain.question.service;
 import com.mySite.sbb.DataNotFoundException;
 import com.mySite.sbb.domain.SiteUser.SiteUser;
 import com.mySite.sbb.domain.answer.entity.Answer;
+import com.mySite.sbb.domain.comment.Comment;
 import com.mySite.sbb.domain.question.entity.Question;
 import com.mySite.sbb.domain.question.repository.QuestionRepository;
 import jakarta.persistence.criteria.*;
@@ -90,11 +91,15 @@ public class QuestionService {
                 Join<Question, SiteUser> u1 = q.join("author", JoinType.LEFT);
                 Join<Question, Answer> a = q.join("answerList", JoinType.LEFT);
                 Join<Answer, SiteUser> u2 = a.join("author", JoinType.LEFT);
+                Join<Answer,Comment> c = a.join("commentList", JoinType.LEFT);
+                Join<Comment,SiteUser> u3 = c.join("author", JoinType.LEFT);
                 return cb.or(cb.like(q.get("subject"), "%" + kw + "%"), // 제목
                         cb.like(q.get("content"), "%" + kw + "%"),      // 내용
                         cb.like(u1.get("username"), "%" + kw + "%"),    // 질문 작성자
                         cb.like(a.get("content"), "%" + kw + "%"),      // 답변 내용
-                        cb.like(u2.get("username"), "%" + kw + "%"));   // 답변 작성자
+                        cb.like(u2.get("username"), "%" + kw + "%"), //답변 작성자
+                        cb.like(c.get("content"),"%"+kw+"%"), //댓글 내용
+                        cb.like(u3.get("username"), "%" + kw + "%")); //댓글 작성자
             }
         };
     }
