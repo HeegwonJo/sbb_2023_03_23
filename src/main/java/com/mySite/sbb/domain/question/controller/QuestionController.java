@@ -61,6 +61,7 @@ public class QuestionController {
         model.addAttribute("paging",myQuestion);
         return"myQuestion_List";
     }
+
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")
     public String questionCreate(QuestionForm questionForm){
