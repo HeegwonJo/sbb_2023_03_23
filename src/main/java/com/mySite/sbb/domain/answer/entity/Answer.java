@@ -1,13 +1,15 @@
 package com.mySite.sbb.domain.answer.entity;
 
 import com.mySite.sbb.domain.SiteUser.SiteUser;
+import com.mySite.sbb.domain.comment.Comment;
 import com.mySite.sbb.domain.question.entity.Question;
-import com.mySite.sbb.domain.question.repository.QuestionRepository;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -32,6 +34,8 @@ public class Answer {
     private SiteUser author;
     @ManyToMany
     Set<SiteUser> voter;
+    @OneToMany(mappedBy = "answer", cascade = CascadeType.REMOVE)
+    private List<Comment> commentList;
 }
 
 

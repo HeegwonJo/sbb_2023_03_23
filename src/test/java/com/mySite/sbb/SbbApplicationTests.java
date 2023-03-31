@@ -6,6 +6,9 @@ import com.mySite.sbb.domain.SiteUser.UserService;
 import com.mySite.sbb.domain.answer.entity.Answer;
 import com.mySite.sbb.domain.answer.repository.AnswerRepository;
 import com.mySite.sbb.domain.answer.service.AnswerService;
+import com.mySite.sbb.domain.comment.Comment;
+import com.mySite.sbb.domain.comment.CommentRepository;
+import com.mySite.sbb.domain.comment.CommentService;
 import com.mySite.sbb.domain.question.entity.Question;
 import com.mySite.sbb.domain.question.repository.QuestionRepository;
 import com.mySite.sbb.domain.question.service.QuestionService;
@@ -40,6 +43,10 @@ class SbbApplicationTests {
     private AnswerRepository answerRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CommentService commentService;
+    @Autowired
+    private CommentRepository commentRepository;
 
 
         // 아래 메서드는 각 테스트케이스가 실행되기 전에 실행된다.
@@ -312,4 +319,20 @@ class SbbApplicationTests {
 
         IntStream.rangeClosed(3, 300).forEach(no -> answerService.create(q,"답변입니다",user2));
     }
+
+
+    @Test
+    @DisplayName("댓글달기 테스트")
+    void t19(){
+        SiteUser user2 = userService.getUser("user2");
+        IntStream.rangeClosed(3, 300).forEach(no -> questionService.create("테스트 제목입니다. %d".formatted(no), "테스트 내용입니다. %d".formatted(no), user2));
+        SiteUser user1 = userService.getUser("user1");
+        IntStream.rangeClosed(3, 300).forEach(no -> questionService.create("테스트 제목입니다. user 1의 %d".formatted(no), "테스트 내용입니다. %d".formatted(no), user1));
+
+        Question q=questionService.getQuestion(299);
+        IntStream.rangeClosed(1, 20).forEach(no -> answerService.create(q,"답변입니다",user2));
+        Answer answer=answerService.getAnswer(5);
+        commentService.create(answer,"댓글테스트",user1);
+    }
+
 }

@@ -5,6 +5,7 @@ import com.mySite.sbb.domain.SiteUser.UserService;
 import com.mySite.sbb.domain.answer.entity.AnswerForm;
 import com.mySite.sbb.domain.answer.entity.Answer;
 import com.mySite.sbb.domain.answer.service.AnswerService;
+import com.mySite.sbb.domain.comment.CommentForm;
 import com.mySite.sbb.domain.question.entity.QuestionForm;
 import com.mySite.sbb.domain.question.entity.Question;
 import com.mySite.sbb.domain.question.service.QuestionService;
@@ -33,7 +34,7 @@ public class QuestionController {
     private final AnswerService answerService;
 
     @GetMapping(value = "/detail/{id}")
-    public String detail(Model model, @PathVariable ("id")Integer id, AnswerForm answerForm , @RequestParam(value="answerPage",defaultValue="0")int answerPage){
+    public String detail(Model model, @PathVariable ("id")Integer id, AnswerForm answerForm , CommentForm commentForm, @RequestParam(value="answerPage",defaultValue="0")int answerPage){
         Question question = this.questionService.getQuestion(id);
         Page<Answer> answerPaging= this.answerService.getList(question,answerPage);
         questionService.Count(question);
